@@ -1,0 +1,10 @@
+# Ad Maiorem Dei Gloriam!
+build/*
+!build/.gitkeep
+
+*.so
+*.exe
+*.out
+
+.vs/*
+out/*
