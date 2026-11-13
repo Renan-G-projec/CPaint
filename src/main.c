@@ -1,6 +1,6 @@
 // Ad Maiorem Dei Gloriam!
-#include <stdio.h>
 #include <raylib.h>
+#include <stdio.h>
 
 #define WINDOW_WIDTH 160 * 6
 #define WINDOW_HEIGHT 90 * 6
@@ -31,25 +31,43 @@ void handle_brush_size_input(float *dest)
 {
     if (IsKeyPressed(KEY_EQUAL))
     {
-        *dest += BRUSH_ADJUSTMENT_SIZE; 
+        *dest += BRUSH_ADJUSTMENT_SIZE;
     }
     if (IsKeyPressed(KEY_MINUS))
     {
         *dest -= BRUSH_ADJUSTMENT_SIZE;
-        if (*dest < BRUSH_MINIMUM_SIZE) *dest = BRUSH_MINIMUM_SIZE;                 
+        if (*dest < BRUSH_MINIMUM_SIZE) *dest = BRUSH_MINIMUM_SIZE;
     }
 }
 
-void handle_brush_draw_input(float brush_size) 
+void connect_mouse_positions(const Vector2 position_start, const Vector2 position_end, float brush_size)
+{
+    DrawLineEx(position_start, position_end, brush_size * 2, RAYWHITE);
+}
+
+void handle_brush_draw_input(float brush_size, bool *is_first_click_flag, Vector2 *mouse_position_tracker)
 {
     Vector2 mouse_pos = GetMousePosition();
 
+    
 
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
+        if (!*is_first_click_flag)
+        {
+            connect_mouse_positions(*mouse_position_tracker, mouse_pos, brush_size);
+        }
+
+        *is_first_click_flag = false;
+        
         DrawCircle(mouse_pos.x, mouse_pos.y, brush_size, RAYWHITE);
+        *mouse_position_tracker = mouse_pos;
+    } 
+    else 
+    {
+        *is_first_click_flag = true;
     }
-    
+
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
     {
         ClearBackground(BLACK);
@@ -64,23 +82,27 @@ int main(void)
 
     float brush_size = DEFAULT_BRUSH_SIZE;
 
+    SetTargetFPS(120);
+
+    Vector2 mouse_position_tracker;
+    bool is_first_click = false;
+
     while (!WindowShouldClose())
     {
-
         // Canvas
-        BeginTextureMode(canvas);        
-            handle_brush_draw_input(brush_size);
-            handle_brush_size_input(&brush_size);
+        BeginTextureMode(canvas);
+        handle_brush_draw_input(brush_size, &is_first_click, &mouse_position_tracker);
+        handle_brush_size_input(&brush_size);
         EndTextureMode();
 
         // Screen
         BeginDrawing();
-            ClearBackground(BLACK);
-            draw_canvas(&canvas, (Vector2){0, 0});
-            draw_brush_target(brush_size);
+        ClearBackground(BLACK);
+        draw_canvas(&canvas, (Vector2){0, 0});
+        draw_brush_target(brush_size);
         EndDrawing();
     }
 
     CloseWindow();
-    return 0;    
+    return 0;
 }
