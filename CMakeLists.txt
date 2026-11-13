@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CPaint C)
 
 set(C_STANDARD_REQUIRED 11)
-set(SRC src/main.c)
+set(SRC src/main.c src/canvas.c)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # TODO: change to fetch-content
