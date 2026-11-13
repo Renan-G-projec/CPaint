@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <raylib.h>
 #include "canvas.h"
+#include "history.h"
 
 #define WINDOW_WIDTH 160 * 6
 #define WINDOW_HEIGHT 90 * 6
@@ -21,11 +22,13 @@ int main(void)
     Vector2 mouse_position_tracker;
     bool is_first_click = false;
 
+    EditorHistory h = history_create();
+    
     while (!WindowShouldClose())
     {
         // Canvas
         BeginTextureMode(canvas);
-        handle_brush_draw_input(brush_size, &is_first_click, &mouse_position_tracker);
+        handle_brush_draw_input(brush_size, &is_first_click, &mouse_position_tracker, &h);
         handle_brush_size_input(&brush_size);
         EndTextureMode();
 

@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 #include "canvas.h"
+#include "history.h"
 
 
 void draw_canvas(RenderTexture2D *canvas, Vector2 position)
@@ -40,21 +41,27 @@ void connect_mouse_positions(const Vector2 position_start, const Vector2 positio
     DrawLineEx(position_start, position_end, brush_size * 2, RAYWHITE);
 }
 
-void handle_brush_draw_input(float brush_size, bool *is_first_click_flag, Vector2 *mouse_position_tracker)
+void handle_brush_draw_input(float brush_size, bool *is_first_click_flag, Vector2 *mouse_position_tracker, EditorHistory *history)
 {
     Vector2 mouse_pos = GetMousePosition();    
 
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
-        if (!*is_first_click_flag)
+        if (*is_first_click_flag)
+        {
+            history_create_mouse_draw_command(history);
+        }
+        else
         {
             connect_mouse_positions(*mouse_position_tracker, mouse_pos, brush_size);
         }
-
+        
         *is_first_click_flag = false;
         
         DrawCircle(mouse_pos.x, mouse_pos.y, brush_size, RAYWHITE);
         *mouse_position_tracker = mouse_pos;
+        
+        history_log_mouse_position(history->undo_stack + history->undo_stack_head, mouse_pos);
     } 
     else 
     {
