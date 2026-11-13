@@ -30,6 +30,12 @@ int main(void)
         BeginTextureMode(canvas);
         handle_brush_draw_input(brush_size, &is_first_click, &mouse_position_tracker, &h);
         handle_brush_size_input(&brush_size);
+
+        if (IsKeyPressed(KEY_Z) && IsKeyDown(KEY_LEFT_CONTROL))
+        {
+            history_undo(&h);
+            draw_canvas_from_history(&canvas, (Vector2){0, 0}, &h, brush_size);
+        }
         EndTextureMode();
 
         // Screen

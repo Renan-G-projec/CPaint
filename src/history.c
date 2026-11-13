@@ -23,23 +23,29 @@ MouseDrawCommand history_undo(EditorHistory *history)
         history->redo_stack_tail = 0;
     }
 
-    MouseDrawCommand command = history->undo_stack[history->undo_stack_head];
-    if (--history->undo_stack_head < 0)
+    int undo_stack_top = (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
+
+    MouseDrawCommand command = history->undo_stack[undo_stack_top];
+    
+    history->undo_stack_head = undo_stack_top;
+    
+    // Buffer is empty; should prevent read but not write
+    if (history->undo_stack_head == history->undo_stack_tail)
     {
-        history->undo_stack_head = COMMAND_BUFFER_SIZE - 1;
+        history->undo_stack_head = -1;
+        history->undo_stack_tail = -1;
     }
 
-    if (++history->redo_stack_head == history->redo_stack_tail)
+    if (history->redo_stack_head == history->redo_stack_tail)
     {
-        free(history->redo_stack[history->redo_stack_head].mouse_logs);
-        history->redo_stack_tail++;
+        const Vector2 *mouse_logs = history->redo_stack[history->redo_stack_tail].mouse_logs;
+        if (!mouse_logs) free(mouse_logs);
 
-        history->redo_stack_head %= COMMAND_BUFFER_SIZE;
-        history->redo_stack_tail %= COMMAND_BUFFER_SIZE;
+        history->redo_stack_tail = (history->redo_stack_tail + 1) % COMMAND_BUFFER_SIZE; 
     }
 
     history->redo_stack[history->redo_stack_head] = command;
-    
+
     return command;
 }
 
@@ -82,27 +88,36 @@ bool history_redo_stack_is_empty(EditorHistory *history)
     return history->redo_stack_head == -1 && history->redo_stack_tail == -1;
 }
 
-MouseDrawCommand* history_create_mouse_draw_command(EditorHistory* history)
+MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory *history)
+{
+    return history->undo_stack + (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
+}
+
+MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)
 {
     if (history_undo_stack_is_empty(history)) 
     {
         history->undo_stack_head = 0;
         history->undo_stack_tail = 0;
     }
-
-    history->undo_stack_head++;
-
-    history->undo_stack_head %= COMMAND_BUFFER_SIZE;
-    history->undo_stack_tail %= COMMAND_BUFFER_SIZE;
-    
-    if (history->undo_stack_head == history->undo_stack_tail)
+    else if (history->undo_stack_head == history->undo_stack_tail)
     {
+        const Vector2 *mouse_logs = history->undo_stack[history->undo_stack_tail].mouse_logs;
+        if (mouse_logs) free(mouse_logs);
         history->undo_stack_tail++;
     }
     
-    history->undo_stack[history->undo_stack_head] = (MouseDrawCommand){malloc(MOUSE_BUFFER_SIZE * sizeof(Vector2)), (size_t)0, (size_t)MOUSE_BUFFER_SIZE};
+    const MouseDrawCommand mouse_draw_command = (MouseDrawCommand){malloc(MOUSE_BUFFER_SIZE * sizeof(Vector2)), (size_t)0, (size_t)MOUSE_BUFFER_SIZE};
+
+    history->undo_stack[history->undo_stack_head] = mouse_draw_command;
+    MouseDrawCommand *mouse_draw_command_address = history->undo_stack + history->undo_stack_head;
+
+    history->undo_stack_head++;
     
-    return history->undo_stack + history->undo_stack_head;
+    history->undo_stack_head %= COMMAND_BUFFER_SIZE;
+    history->undo_stack_tail %= COMMAND_BUFFER_SIZE;
+    
+    return mouse_draw_command_address;
 }
 
 void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_position)
@@ -112,7 +127,7 @@ void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_p
     if (command->num_of_logs + 1 >= command->log_capacity)
     {
         command->log_capacity *= 2;
-        command->mouse_logs = realloc((void*)command->mouse_logs, command->log_capacity);
+        command->mouse_logs = realloc(command->mouse_logs, command->log_capacity * sizeof(Vector2));
         if (command->mouse_logs == NULL) 
         {
             exit(1);
@@ -121,3 +136,4 @@ void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_p
 
     command->mouse_logs[command->num_of_logs++] = mouse_position;
 }
+

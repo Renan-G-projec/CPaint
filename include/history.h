@@ -18,7 +18,6 @@ typedef struct
 } MouseDrawCommand;
 
 // Editor History should not realllocate each time so a circular buffer works better. 32 is even a overkill for here
-
 typedef struct
 {
     MouseDrawCommand undo_stack[COMMAND_BUFFER_SIZE];
@@ -36,6 +35,7 @@ MouseDrawCommand history_undo(EditorHistory*);
 MouseDrawCommand history_redo(EditorHistory*);
 bool history_undo_stack_is_empty(EditorHistory*);
 bool history_redo_stack_is_empty(EditorHistory*);
+MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory*);
 
 MouseDrawCommand* history_create_mouse_draw_command(EditorHistory*);
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);
