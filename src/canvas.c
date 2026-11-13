@@ -15,7 +15,6 @@ void draw_canvas_from_history(RenderTexture2D *canvas, Vector2 position, EditorH
     ClearBackground(BLACK);
     if (history_undo_stack_is_empty(history)) return;
 
-    printf("DRAW\nhead: %d | tail: %d\n", history->undo_stack_head, history->undo_stack_tail);
     for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
     {
         if (!history->undo_stack[idx].mouse_logs) continue;

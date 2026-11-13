@@ -23,6 +23,7 @@ int main(void)
     bool is_first_click = false;
 
     EditorHistory h = history_create();
+    SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
     
     while (!WindowShouldClose())
     {
@@ -42,10 +43,10 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLACK);
         draw_canvas(&canvas, (Vector2){0, 0});
-        draw_brush_target(brush_size);
+        //draw_brush_target(brush_size);
         EndDrawing();
     }
-
+    history_destroy(&h);
     CloseWindow();
     return 0;
 }

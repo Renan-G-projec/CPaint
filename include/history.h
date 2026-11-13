@@ -36,6 +36,7 @@ MouseDrawCommand history_redo(EditorHistory*);
 bool history_undo_stack_is_empty(EditorHistory*);
 bool history_redo_stack_is_empty(EditorHistory*);
 MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory*);
+void history_destroy(EditorHistory*);
 
 MouseDrawCommand* history_create_mouse_draw_command(EditorHistory*);
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);

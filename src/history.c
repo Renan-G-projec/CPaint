@@ -93,6 +93,21 @@ MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory *history)
     return history->undo_stack + (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
 }
 
+void history_destroy(EditorHistory *history)
+{
+    for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
+    {
+        if (!history->undo_stack[idx].mouse_logs) continue;
+        free(history->undo_stack[idx].mouse_logs);
+    }
+
+    for (int idx = history->redo_stack_tail; idx != history->redo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
+    {
+        if (!history->redo_stack[idx].mouse_logs) continue;
+        free(history->redo_stack[idx].mouse_logs);
+    }
+}
+
 MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)
 {
     if (history_undo_stack_is_empty(history)) 
