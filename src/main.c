@@ -7,18 +7,6 @@
 #define WINDOW_WIDTH 160 * 6
 #define WINDOW_HEIGHT 90 * 6
 
-typedef struct
-{
-    Vector2 *mouse_logs;
-    size_t num_of_logs;
-} DrawCommand;
-
-typedef struct
-{
-    DrawCommand *data;
-    size_t size;
-} EditorHistory;
-
 
 int main(void)
 {
