@@ -17,14 +17,9 @@ EditorHistory history_create(void)
 MouseDrawCommand history_undo(EditorHistory *history)
 {
     if (history_undo_stack_is_empty(history)) return (MouseDrawCommand){NULL, 0};
-    if (history_redo_stack_is_empty(history)) 
-    {
-        history->redo_stack_head = 0;
-        history->redo_stack_tail = 0;
-    }
-
+    
     int undo_stack_top = (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
-
+    
     MouseDrawCommand command = history->undo_stack[undo_stack_top];
     
     history->undo_stack_head = undo_stack_top;
@@ -35,8 +30,13 @@ MouseDrawCommand history_undo(EditorHistory *history)
         history->undo_stack_head = -1;
         history->undo_stack_tail = -1;
     }
-
-    if (history->redo_stack_head == history->redo_stack_tail)
+    
+    if (history_redo_stack_is_empty(history)) 
+    {
+        history->redo_stack_head = 0;
+        history->redo_stack_tail = 0;
+    }
+    else if (history->redo_stack_head == history->redo_stack_tail)
     {
         const Vector2 *mouse_logs = history->redo_stack[history->redo_stack_tail].mouse_logs;
         if (!mouse_logs) free(mouse_logs);
@@ -45,6 +45,7 @@ MouseDrawCommand history_undo(EditorHistory *history)
     }
 
     history->redo_stack[history->redo_stack_head] = command;
+    history->redo_stack_head = (history->redo_stack_head + 1) % COMMAND_BUFFER_SIZE;
 
     return command;
 }
@@ -103,6 +104,7 @@ void history_destroy(EditorHistory *history)
 
     for (int idx = history->redo_stack_tail; idx != history->redo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
     {
+        printf("Freed memory of redo mouse draw command n %d\n", idx);
         if (!history->redo_stack[idx].mouse_logs) continue;
         free(history->redo_stack[idx].mouse_logs);
     }
