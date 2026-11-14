@@ -9,6 +9,7 @@
 
 #define COMMAND_BUFFER_SIZE 32
 #define MOUSE_BUFFER_SIZE 1024
+#define OLD_HISTORY_BUFFER_SIZE 16
 
 typedef struct
 {
@@ -20,8 +21,13 @@ typedef struct
 // Editor History should not realllocate each time so a circular buffer works better. 32 is even a overkill for here
 typedef struct
 {
+    MouseDrawCommand* old_history_stack;    
     MouseDrawCommand undo_stack[COMMAND_BUFFER_SIZE];
     MouseDrawCommand redo_stack[COMMAND_BUFFER_SIZE];
+    
+    size_t old_history_stack_size;
+    size_t old_history_stack_capacity;
+    Texture2D old_history_initial_image;
 
     int undo_stack_head;
     int redo_stack_head;
@@ -47,5 +53,8 @@ void history_destroy(EditorHistory*);
 
 MouseDrawCommand* history_create_mouse_draw_command(EditorHistory*);
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);
+
+void history_push_to_old_history(EditorHistory*, MouseDrawCommand);
+void history_clear_old_history(EditorHistory*);
 
 #endif

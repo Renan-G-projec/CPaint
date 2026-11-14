@@ -13,8 +13,13 @@ void draw_canvas(RenderTexture2D *canvas, Vector2 position)
 void draw_canvas_from_history(RenderTexture2D *canvas, Vector2 position, EditorHistory* history, float brush_size)
 {
     ClearBackground(BLACK);
+    for (size_t idx = 0; idx <= history->old_history_stack_size; ++idx)
+    {
+        if (!history->old_history_stack[idx].mouse_logs) continue;
+        connect_mouse_positions_array(history->old_history_stack[idx].mouse_logs, history->old_history_stack[idx].num_of_logs, brush_size);
+    }
+    
     if (history_undo_stack_is_empty(history)) return;
-
     for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
     {
         if (!history->undo_stack[idx].mouse_logs) continue;

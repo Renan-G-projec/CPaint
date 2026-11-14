@@ -4,6 +4,14 @@
 EditorHistory history_create(void)
 {
     EditorHistory h;
+    h.old_history_stack = malloc(sizeof(MouseDrawCommand) * MOUSE_BUFFER_SIZE);
+    h.old_history_stack_capacity = MOUSE_BUFFER_SIZE;
+    h.old_history_stack_size = 0;
+
+    if (!h.old_history_stack)
+    {
+        exit(1);
+    }
 
     h.undo_stack_head = -1;
     h.redo_stack_head = -1;
@@ -38,9 +46,7 @@ MouseDrawCommand history_undo(EditorHistory *history)
     }
     else if (history->redo_stack_head == history->redo_stack_tail)
     {
-        const Vector2 *mouse_logs = history->redo_stack[history->redo_stack_tail].mouse_logs;
-        if (!mouse_logs) free(mouse_logs);
-
+        history_push_to_old_history(history, history->redo_stack[history->redo_stack_tail]);
         history->redo_stack_tail = (history->redo_stack_tail + 1) % COMMAND_BUFFER_SIZE; 
     }
 
@@ -74,8 +80,7 @@ MouseDrawCommand history_redo(EditorHistory *history)
     }
     else if (history->undo_stack_head == history->undo_stack_tail)
     {
-        const Vector2 *mouse_logs = history->undo_stack[history->undo_stack_tail].mouse_logs;
-        if (mouse_logs) free(mouse_logs);
+        history_push_to_old_history(history, history->undo_stack[history->undo_stack_tail]);
 
         history->undo_stack_tail = (history->undo_stack_tail + 1) % COMMAND_BUFFER_SIZE; 
     }
@@ -132,6 +137,7 @@ void history_destroy(EditorHistory *history)
 {
     history_clear_undo_stack(history);   
     history_clear_redo_stack(history);
+    history_clear_old_history(history);
 }
 
 MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)
@@ -143,8 +149,7 @@ MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)
     }
     else if (history->undo_stack_head == history->undo_stack_tail)
     {
-        const Vector2 *mouse_logs = history->undo_stack[history->undo_stack_tail].mouse_logs;
-        if (mouse_logs) free(mouse_logs);
+        history_push_to_old_history(history, history->undo_stack[history->undo_stack_tail]);
         history->undo_stack_tail++;
     }
     
@@ -178,3 +183,29 @@ void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_p
     command->mouse_logs[command->num_of_logs++] = mouse_position;
 }
 
+void history_push_to_old_history(EditorHistory *history, MouseDrawCommand cmd)
+{
+    history->old_history_stack_size++;
+    if (history->old_history_stack_size >= history->old_history_stack_capacity)
+    {
+        history->old_history_stack_capacity *= 2;
+        history->old_history_stack = realloc(history->old_history_stack, sizeof(MouseDrawCommand) * history->old_history_stack_capacity);
+        if (!history->old_history_stack)
+        {
+            exit(1);
+        }
+    }
+
+    history->old_history_stack[history->old_history_stack_size] = cmd;
+}
+
+void history_clear_old_history(EditorHistory *history)
+{
+    if (history->old_history_stack_size = 0) return;
+    for (size_t i = 0; i < history->old_history_stack_size; ++i)
+    {
+        Vector2 *mouse_logs = history->old_history_stack[i].mouse_logs;
+        if (mouse_logs) free(mouse_logs);
+    }
+    free(history->old_history_stack);
+}

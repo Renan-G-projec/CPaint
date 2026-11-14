@@ -40,7 +40,6 @@ int main(void)
 
         if (IsKeyPressed(KEY_Y) && IsKeyDown(KEY_LEFT_CONTROL))
         {
-            printf("SHOULD REDO\n");
             history_redo(&h);
             draw_canvas_from_history(&canvas, (Vector2){0, 0}, &h, brush_size);
         }
