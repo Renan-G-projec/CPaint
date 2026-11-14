@@ -10,6 +10,7 @@
 #define COMMAND_BUFFER_SIZE 32
 #define MOUSE_BUFFER_SIZE 1024
 #define OLD_HISTORY_BUFFER_SIZE 16
+#define MAXIMUM_OLD_HISTORY_BUFFER_SIZE 128
 
 typedef struct
 {
@@ -54,6 +55,7 @@ void history_destroy(EditorHistory*);
 MouseDrawCommand* history_create_mouse_draw_command(EditorHistory*);
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);
 
+void history_save_snapshot(EditorHistory*, Texture2D);
 void history_push_to_old_history(EditorHistory*, MouseDrawCommand);
 void history_clear_old_history(EditorHistory*);
 

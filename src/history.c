@@ -183,6 +183,18 @@ void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_p
     command->mouse_logs[command->num_of_logs++] = mouse_position;
 }
 
+void history_save_snapshot(EditorHistory *history, Texture2D snapshot)
+{
+    // The old command table is not needed anymore.
+    for (size_t deletion_index = 0; deletion_index < history->old_history_stack_size; ++deletion_index)
+    {
+        if (history->old_history_stack[deletion_index].mouse_logs) free(history->old_history_stack[deletion_index].mouse_logs);
+    }
+    history->old_history_stack_size = 0;
+
+    history->old_history_initial_image = snapshot;
+}
+
 void history_push_to_old_history(EditorHistory *history, MouseDrawCommand cmd)
 {
     history->old_history_stack_size++;

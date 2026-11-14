@@ -13,6 +13,8 @@ void draw_canvas(RenderTexture2D *canvas, Vector2 position)
 void draw_canvas_from_history(RenderTexture2D *canvas, Vector2 position, EditorHistory* history, float brush_size)
 {
     ClearBackground(BLACK);
+    DrawTextureRec(history->old_history_initial_image, (Rectangle){0, 0, history->old_history_initial_image.width, -history->old_history_initial_image.height}, position, RAYWHITE);
+
     for (size_t idx = 0; idx <= history->old_history_stack_size; ++idx)
     {
         if (!history->old_history_stack[idx].mouse_logs) continue;
