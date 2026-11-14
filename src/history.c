@@ -53,29 +53,36 @@ MouseDrawCommand history_undo(EditorHistory *history)
 MouseDrawCommand history_redo(EditorHistory *history)
 {
     if (history_redo_stack_is_empty(history)) return (MouseDrawCommand){NULL, 0};
+    
+    int redo_stack_top = (history->redo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
+    
+    MouseDrawCommand command = history->redo_stack[redo_stack_top];
+    
+    history->redo_stack_head = redo_stack_top;
+    
+    // Buffer is empty; should prevent read but not write
+    if (history->redo_stack_head == history->redo_stack_tail)
+    {
+        history->redo_stack_head = -1;
+        history->redo_stack_tail = -1;
+    }
+    
     if (history_undo_stack_is_empty(history)) 
     {
         history->undo_stack_head = 0;
         history->undo_stack_tail = 0;
     }
-
-    MouseDrawCommand command = history->redo_stack[history->redo_stack_head];
-    if (--history->redo_stack_head < 0)
+    else if (history->undo_stack_head == history->undo_stack_tail)
     {
-        history->redo_stack_head = COMMAND_BUFFER_SIZE - 1;
+        const Vector2 *mouse_logs = history->undo_stack[history->undo_stack_tail].mouse_logs;
+        if (mouse_logs) free(mouse_logs);
+
+        history->undo_stack_tail = (history->undo_stack_tail + 1) % COMMAND_BUFFER_SIZE; 
     }
 
-    if (++history->undo_stack_head == history->undo_stack_tail)
-    {
-        free(history->undo_stack[history->undo_stack_head].mouse_logs);
-        history->undo_stack_tail++;
-
-        history->undo_stack_head %= COMMAND_BUFFER_SIZE;
-        history->undo_stack_tail %= COMMAND_BUFFER_SIZE;
-    }
-    
     history->undo_stack[history->undo_stack_head] = command;
-    
+    history->undo_stack_head = (history->undo_stack_head + 1) % COMMAND_BUFFER_SIZE;
+
     return command;
 }
 
@@ -89,6 +96,33 @@ bool history_redo_stack_is_empty(EditorHistory *history)
     return history->redo_stack_head == -1 && history->redo_stack_tail == -1;
 }
 
+void history_clear_undo_stack(EditorHistory *history)
+{
+    if (history_undo_stack_is_empty(history)) return;
+    for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
+    {
+        if (!history->undo_stack[idx].mouse_logs) continue;
+        free(history->undo_stack[idx].mouse_logs);
+    }
+
+    history->undo_stack_head = -1;
+    history->undo_stack_tail = -1;
+}
+
+void history_clear_redo_stack(EditorHistory *history)
+{
+    if (history_undo_stack_is_empty(history)) return;
+
+    for (int idx = history->redo_stack_tail; idx != history->redo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
+    {
+        if (!history->redo_stack[idx].mouse_logs) continue;
+        free(history->redo_stack[idx].mouse_logs);
+    }
+
+    history->redo_stack_head = -1;
+    history->redo_stack_tail = -1;
+}
+
 MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory *history)
 {
     return history->undo_stack + (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
@@ -96,18 +130,8 @@ MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory *history)
 
 void history_destroy(EditorHistory *history)
 {
-    for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
-    {
-        if (!history->undo_stack[idx].mouse_logs) continue;
-        free(history->undo_stack[idx].mouse_logs);
-    }
-
-    for (int idx = history->redo_stack_tail; idx != history->redo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
-    {
-        printf("Freed memory of redo mouse draw command n %d\n", idx);
-        if (!history->redo_stack[idx].mouse_logs) continue;
-        free(history->redo_stack[idx].mouse_logs);
-    }
+    history_clear_undo_stack(history);   
+    history_clear_redo_stack(history);
 }
 
 MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)

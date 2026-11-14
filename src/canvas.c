@@ -75,6 +75,7 @@ void handle_brush_draw_input(float brush_size, bool *is_first_click_flag, Vector
     {
         if (*is_first_click_flag)
         {
+            history_clear_redo_stack(history);
             history_create_mouse_draw_command(history);
         }
         else
