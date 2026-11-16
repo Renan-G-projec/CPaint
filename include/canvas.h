@@ -15,6 +15,7 @@ typedef struct {
 } Canvas;
 
 typedef struct {
+    Color color;
     Vector2 current_pos;
     Vector2 last_pos;
     float size;

@@ -77,9 +77,9 @@ void handle_brush_draw_input(Brush *brush, Canvas *canvas)
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
 
-        DrawLineEx(brush->last_pos, brush->current_pos, brush->size * 2, RAYWHITE);
+        DrawLineEx(brush->last_pos, brush->current_pos, brush->size * 2, brush->color);
         
-        DrawCircle(mouse_pos.x, mouse_pos.y, brush->size, RAYWHITE);
+        DrawCircle(mouse_pos.x, mouse_pos.y, brush->size, brush->color);
         
         history_log_mouse_position(history_get_last_mouse_draw_command(&(canvas->history)), mouse_pos);
     }

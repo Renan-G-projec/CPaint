@@ -11,12 +11,12 @@ typedef enum {
     ON_MAIN_CANVAS,
     ON_SAVE_DIALOGUE,
     ON_CLOSE_DIALOGUE
-} State;
+} CPaintGuiState;
  
 typedef struct {
     Canvas canvas;
     Brush brush;
-    State state;
+    CPaintGuiState state;
 } CPaintState;
 
 // Creates a local variable representing the state of the program. Can be moved to another struct
