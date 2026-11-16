@@ -13,19 +13,26 @@ int main(void)
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "CPaint");
 
-    RenderTexture2D canvas = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    float brush_size = DEFAULT_BRUSH_SIZE;
-
     SetTargetFPS(120);
 
     char file_to_save[256] = {0};
 
-    Vector2 mouse_position_tracker;
-    bool is_first_click = false;
+    Canvas canvas = {
+        LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT),
+        history_create(),
+        {0, 0},
+    };
+
+    Brush brush = {
+        {0, 0},
+        {0, 0},
+        DEFAULT_BRUSH_SIZE,
+        false,
+        false
+    };
+
     bool is_on_file_dialogue = false;
 
-    EditorHistory h = history_create();
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
     
     while (!WindowShouldClose())
@@ -33,27 +40,28 @@ int main(void)
         // Canvas
         if (!is_on_file_dialogue)
         {
-            BeginTextureMode(canvas);
-            handle_brush_draw_input(brush_size, &is_first_click, &mouse_position_tracker, &h);
-            handle_brush_size_input(&brush_size);
+            brush.last_pos = brush.current_pos;
+            brush.current_pos = GetMousePosition();
+
+            BeginTextureMode(canvas.tex);
+            handle_brush_draw_input(&brush, &canvas);
             
             if (IsKeyPressed(KEY_Z) && IsKeyDown(KEY_LEFT_CONTROL))
             {
-                history_undo(&h);
-                draw_canvas_from_history(&canvas, (Vector2){0, 0}, &h, brush_size);
+                history_undo(&(canvas.history));
+                draw_canvas_from_history(&canvas);
             }
             
             if (IsKeyPressed(KEY_Y) && IsKeyDown(KEY_LEFT_CONTROL))
             {
-                history_redo(&h);
-                draw_canvas_from_history(&canvas, (Vector2){0, 0}, &h, brush_size);
+                history_redo(&(canvas.history));
+                draw_canvas_from_history(&canvas);
             }
             EndTextureMode();
 
             if (IsKeyPressed(KEY_S) && IsKeyDown(KEY_LEFT_CONTROL))
             {
                 is_on_file_dialogue = true;
-                is_first_click = true;
                 SetMouseCursor(MOUSE_CURSOR_DEFAULT);
             }
         }
@@ -61,7 +69,7 @@ int main(void)
         // Screen
         BeginDrawing();
         ClearBackground(BLACK);
-        draw_canvas(&canvas, (Vector2){0, 0});
+        draw_canvas(&canvas);
 
         if (is_on_file_dialogue)
         {
@@ -78,12 +86,11 @@ int main(void)
                 is_on_file_dialogue = false;
                 save_canvas_to_file(&canvas, file_to_save);
             }
-
         }
 
         EndDrawing();
     }
-    history_destroy(&h);
+    canvas_destroy(&canvas);
     CloseWindow();
     return 0;
 }

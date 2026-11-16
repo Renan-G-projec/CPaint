@@ -5,7 +5,6 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "history.h"
 
 #define COMMAND_BUFFER_SIZE 32
 #define MOUSE_BUFFER_SIZE 1024
@@ -17,6 +16,7 @@ typedef struct
     Vector2 *mouse_logs;
     size_t num_of_logs;
     size_t log_capacity;
+    float brush_size;
 } MouseDrawCommand;
 
 // Editor History should not realllocate each time so a circular buffer works better. 32 is even a overkill for here
@@ -35,28 +35,28 @@ typedef struct
 
     int undo_stack_tail;
     int redo_stack_tail;
-} EditorHistory;
+} CanvasHistory;
 
-EditorHistory history_create(void);
+CanvasHistory history_create(void);
 
-MouseDrawCommand history_undo(EditorHistory*);
-MouseDrawCommand history_redo(EditorHistory*);
+MouseDrawCommand history_undo(CanvasHistory*);
+MouseDrawCommand history_redo(CanvasHistory*);
 
-bool history_undo_stack_is_empty(EditorHistory*);
-bool history_redo_stack_is_empty(EditorHistory*);
+bool history_undo_stack_is_empty(CanvasHistory*);
+bool history_redo_stack_is_empty(CanvasHistory*);
 
-void history_clear_undo_stack(EditorHistory*);
-void history_clear_redo_stack(EditorHistory*);
+void history_clear_undo_stack(CanvasHistory*);
+void history_clear_redo_stack(CanvasHistory*);
 
-MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory*);
+MouseDrawCommand *history_get_last_mouse_draw_command(CanvasHistory*);
 
-void history_destroy(EditorHistory*);
+void history_destroy(CanvasHistory*);
 
-MouseDrawCommand* history_create_mouse_draw_command(EditorHistory*);
+MouseDrawCommand* history_create_mouse_draw_command(CanvasHistory*, float brush_size);
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);
 
-void history_save_snapshot(EditorHistory*, Texture2D);
-void history_push_to_old_history(EditorHistory*, MouseDrawCommand);
-void history_clear_old_history(EditorHistory*);
+void history_save_snapshot(CanvasHistory*, Texture2D);
+void history_push_to_old_history(CanvasHistory*, MouseDrawCommand);
+void history_clear_old_history(CanvasHistory*);
 
 #endif

@@ -1,9 +1,9 @@
 // Ad Maiorme Dei Gloriam!
 #include "history.h"
 
-EditorHistory history_create(void)
+CanvasHistory history_create(void)
 {
-    EditorHistory h;
+    CanvasHistory h;
     h.old_history_stack = malloc(sizeof(MouseDrawCommand) * MOUSE_BUFFER_SIZE);
     h.old_history_stack_capacity = MOUSE_BUFFER_SIZE;
     h.old_history_stack_size = 0;
@@ -22,7 +22,7 @@ EditorHistory history_create(void)
     return h;
 }
 
-MouseDrawCommand history_undo(EditorHistory *history)
+MouseDrawCommand history_undo(CanvasHistory *history)
 {
     if (history_undo_stack_is_empty(history)) return (MouseDrawCommand){NULL, 0};
     
@@ -56,7 +56,7 @@ MouseDrawCommand history_undo(EditorHistory *history)
     return command;
 }
 
-MouseDrawCommand history_redo(EditorHistory *history)
+MouseDrawCommand history_redo(CanvasHistory *history)
 {
     if (history_redo_stack_is_empty(history)) return (MouseDrawCommand){NULL, 0};
     
@@ -91,17 +91,17 @@ MouseDrawCommand history_redo(EditorHistory *history)
     return command;
 }
 
-bool history_undo_stack_is_empty(EditorHistory *history)
+bool history_undo_stack_is_empty(CanvasHistory *history)
 {
     return history->undo_stack_head == -1 && history->undo_stack_tail == -1;
 }
 
-bool history_redo_stack_is_empty(EditorHistory *history)
+bool history_redo_stack_is_empty(CanvasHistory *history)
 {
     return history->redo_stack_head == -1 && history->redo_stack_tail == -1;
 }
 
-void history_clear_undo_stack(EditorHistory *history)
+void history_clear_undo_stack(CanvasHistory *history)
 {
     if (history_undo_stack_is_empty(history)) return;
     for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
@@ -114,7 +114,7 @@ void history_clear_undo_stack(EditorHistory *history)
     history->undo_stack_tail = -1;
 }
 
-void history_clear_redo_stack(EditorHistory *history)
+void history_clear_redo_stack(CanvasHistory *history)
 {
     if (history_undo_stack_is_empty(history)) return;
 
@@ -128,19 +128,19 @@ void history_clear_redo_stack(EditorHistory *history)
     history->redo_stack_tail = -1;
 }
 
-MouseDrawCommand *history_get_last_mouse_draw_command(EditorHistory *history)
+MouseDrawCommand *history_get_last_mouse_draw_command(CanvasHistory *history)
 {
     return history->undo_stack + (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
 }
 
-void history_destroy(EditorHistory *history)
+void history_destroy(CanvasHistory *history)
 {
     history_clear_undo_stack(history);   
     history_clear_redo_stack(history);
     history_clear_old_history(history);
 }
 
-MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)
+MouseDrawCommand *history_create_mouse_draw_command(CanvasHistory* history, float brush_size)
 {
     if (history_undo_stack_is_empty(history)) 
     {
@@ -153,7 +153,7 @@ MouseDrawCommand *history_create_mouse_draw_command(EditorHistory* history)
         history->undo_stack_tail++;
     }
     
-    const MouseDrawCommand mouse_draw_command = (MouseDrawCommand){malloc(MOUSE_BUFFER_SIZE * sizeof(Vector2)), (size_t)0, (size_t)MOUSE_BUFFER_SIZE};
+    const MouseDrawCommand mouse_draw_command = (MouseDrawCommand){malloc(MOUSE_BUFFER_SIZE * sizeof(Vector2)), (size_t)0, (size_t)MOUSE_BUFFER_SIZE, brush_size};
 
     history->undo_stack[history->undo_stack_head] = mouse_draw_command;
     MouseDrawCommand *mouse_draw_command_address = history->undo_stack + history->undo_stack_head;
@@ -183,7 +183,7 @@ void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_p
     command->mouse_logs[command->num_of_logs++] = mouse_position;
 }
 
-void history_save_snapshot(EditorHistory *history, Texture2D snapshot)
+void history_save_snapshot(CanvasHistory *history, Texture2D snapshot)
 {
     // The old command table is not needed anymore.
     for (size_t deletion_index = 0; deletion_index < history->old_history_stack_size; ++deletion_index)
@@ -195,7 +195,7 @@ void history_save_snapshot(EditorHistory *history, Texture2D snapshot)
     history->old_history_initial_image = snapshot;
 }
 
-void history_push_to_old_history(EditorHistory *history, MouseDrawCommand cmd)
+void history_push_to_old_history(CanvasHistory *history, MouseDrawCommand cmd)
 {
     history->old_history_stack_size++;
     if (history->old_history_stack_size >= history->old_history_stack_capacity)
@@ -211,9 +211,9 @@ void history_push_to_old_history(EditorHistory *history, MouseDrawCommand cmd)
     history->old_history_stack[history->old_history_stack_size] = cmd;
 }
 
-void history_clear_old_history(EditorHistory *history)
+void history_clear_old_history(CanvasHistory *history)
 {
-    if (history->old_history_stack_size = 0) return;
+    if (history->old_history_stack_size == 0) return;
     for (size_t i = 0; i < history->old_history_stack_size; ++i)
     {
         Vector2 *mouse_logs = history->old_history_stack[i].mouse_logs;

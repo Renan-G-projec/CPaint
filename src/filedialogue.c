@@ -1,6 +1,5 @@
 // Ad Maiorem Dei Gloriam!
 #include "filedialogue.h"
-#include <stdio.h>
 #include <raygui.h>
 #include <raylib.h>
 
@@ -11,8 +10,8 @@ FiledialogueInput filedialogue_draw_and_get_inputs(char* filename)
     FiledialogueInput input = 0;
 
     const Rectangle message_rect = {
-        GetScreenWidth() / 2 - 100,
-        GetScreenHeight() / 2 - 100,
+        (int)(GetScreenWidth() / 2) - 100,
+        (int)(GetScreenHeight() / 2) - 100,
         200,
         200
     };
