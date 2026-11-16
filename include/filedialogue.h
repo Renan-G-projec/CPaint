@@ -4,11 +4,10 @@
 
 typedef enum {
     FILEDIALOGUE_NO_INPUT,
+    FILEDIALOGUE_CLOSE,  
     FILEDIALOGUE_SAVE,
-    FILEDIALOGUE_CLOSE  
 } FiledialogueInput;
 
-void filedialogue_draw_dialogue(void);
-FiledialogueInput filedialogue_get_inputs(void);
+FiledialogueInput filedialogue_draw_and_get_inputs(char *filename);
 
 #endif

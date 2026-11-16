@@ -41,6 +41,7 @@ void draw_brush_target(float brush_size)
 bool save_canvas_to_file(RenderTexture2D *canvas, const char *filepath)
 {
     Image img = LoadImageFromTexture(canvas->texture);
+    ImageFlipVertical(&img);
     return ExportImage(img, filepath);
 }
 

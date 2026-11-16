@@ -1,7 +1,6 @@
 // Ad Maiorem Dei Gloriam!
-
-#include <stdio.h>
 #include <raylib.h>
+#include <raygui.h>
 #include "filedialogue.h"
 #include "canvas.h"
 #include "history.h"
@@ -19,6 +18,8 @@ int main(void)
     float brush_size = DEFAULT_BRUSH_SIZE;
 
     SetTargetFPS(120);
+
+    char file_to_save[256] = {0};
 
     Vector2 mouse_position_tracker;
     bool is_first_click = false;
@@ -65,20 +66,19 @@ int main(void)
         if (is_on_file_dialogue)
         {
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 100});
-            filedialogue_draw_dialogue();
-            
-            const FiledialogueInput input = filedialogue_get_inputs();
+
+            const FiledialogueInput input = filedialogue_draw_and_get_inputs(file_to_save);
             if (input == FILEDIALOGUE_CLOSE) 
             {
                 is_on_file_dialogue = false;
                 SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
             }
-            else if (input == FILEDIALOGUE_SAVE)
+            if (input == FILEDIALOGUE_SAVE)
             {
                 is_on_file_dialogue = false;
-                save_canvas_to_file(&canvas, "./build/save.png");
-                break;
+                save_canvas_to_file(&canvas, file_to_save);
             }
+
         }
 
         EndDrawing();
