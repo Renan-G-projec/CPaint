@@ -1,5 +1,6 @@
 // Ad Maiorme Dei Gloriam!
 #include "history.h"
+#include "canvas.h"
 
 CanvasHistory history_create(void)
 {
