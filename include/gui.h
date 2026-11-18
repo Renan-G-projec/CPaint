@@ -14,11 +14,15 @@ typedef enum {
 typedef struct {
     // Dependencies and state
     Color *current_color;
-    CPaintGuiState current_state;
-
     // Layout
     Rectangle color_picker_rec;
     Rectangle color_picker_toggle_rec;
+    Rectangle save_new_canvas_rec;
+    Rectangle save_new_canvas_input_rec;
+
+    CPaintGuiState current_state;
+    bool shall_save;
+    char *filename_buffer;
 } GuiData;
 
 GuiData gui_init(Vector2 screen_size, Color *current_color);

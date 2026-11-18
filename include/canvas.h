@@ -12,6 +12,8 @@ typedef struct {
     RenderTexture2D tex;
     CanvasHistory history;
     Vector2 position;
+    char *filename;
+    bool is_first_save;
 } Canvas;
 
 typedef struct {

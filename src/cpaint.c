@@ -1,16 +1,12 @@
 // Ad Maiorem Dei Gloriam!
 #include <raylib.h>
 #include <raygui.h>
-#include "filedialogue.h"
 #include "cpaint.h"
 #include "canvas.h"
+#include <string.h>
 #include "history.h"
 
 #include "gui.h"
-
-static char file_to_save[256] = {0};
-static void cpaint_draw_dialogues(CPaintState *state);
-
 void cpaint_start_loop(void)
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "CPaint");
@@ -19,6 +15,8 @@ void cpaint_start_loop(void)
             LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT),
             history_create(),
             {0, 0},
+            NULL,
+            true,
         },
         {
             RAYWHITE,
@@ -64,7 +62,18 @@ void cpaint_start_loop(void)
             
             if (IsKeyPressed(KEY_S) && IsKeyDown(KEY_LEFT_CONTROL))
             {
-                state.brush.is_locked = true;
+                if (state.canvas.is_first_save) 
+                { 
+                    state.canvas.filename = (char*)malloc(sizeof(char) * 256);
+                    memset(state.canvas.filename, 0, sizeof(char) * 256);
+                    state.gui_data.filename_buffer = state.canvas.filename;
+                    state.gui_data.current_state = CPAINT_GUI_SAVE_NEW_CANVAS; 
+                } 
+                else
+                {
+                    save_canvas_to_file(&(state.canvas), state.canvas.filename);
+                }
+
                 SetMouseCursor(MOUSE_CURSOR_DEFAULT);
             }
         }
@@ -75,8 +84,14 @@ void cpaint_start_loop(void)
         draw_canvas(&(state.canvas));
 
         gui_render_all(&(state.gui_data));
-        
         EndDrawing();
+
+        if (state.gui_data.shall_save)
+        {
+            save_canvas_to_file(&(state.canvas), state.canvas.filename);
+            state.canvas.is_first_save = false;
+            state.gui_data.shall_save = false;
+        }
     }
     canvas_destroy(&(state.canvas));
     CloseWindow();
