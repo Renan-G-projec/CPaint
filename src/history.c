@@ -170,6 +170,13 @@ MouseDrawCommand *history_create_mouse_draw_command(CanvasHistory* history, floa
 void history_log_mouse_position(MouseDrawCommand* command, const Vector2 mouse_position)
 {
     if (!command) return;
+    const Vector2 command_mouse_pos = command->mouse_logs[command->num_of_logs];
+
+    if ((int)command_mouse_pos.x == (int)mouse_position.x && (int)command_mouse_pos.y == (int)mouse_position.y)
+    {
+        printf("Mouse is on same position!\n");
+        return;
+    }
 
     if (command->num_of_logs + 1 >= command->log_capacity)
     {
@@ -214,7 +221,6 @@ void history_push_to_old_history(CanvasHistory *history, MouseDrawCommand cmd)
 
 void history_clear_old_history(CanvasHistory *history)
 {
-    if (history->old_history_stack_size == 0) return;
     for (size_t i = 0; i < history->old_history_stack_size; ++i)
     {
         Vector2 *mouse_logs = history->old_history_stack[i].mouse_logs;

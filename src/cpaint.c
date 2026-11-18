@@ -6,8 +6,10 @@
 #include "canvas.h"
 #include "history.h"
 
+#include "gui.h"
+
 static char file_to_save[256] = {0};
-static void cpaint_update_gui(CPaintState *state);
+static void cpaint_draw_dialogues(CPaintState *state);
 
 void cpaint_start_loop(void)
 {
@@ -26,12 +28,12 @@ void cpaint_start_loop(void)
             false,
             false
         },
-        ON_MAIN_CANVAS
+        0
     };
 
+    state.gui_data = gui_init((Vector2){WINDOW_WIDTH, WINDOW_HEIGHT}, &(state.brush.color));
 
     SetTargetFPS(120);
-
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
     
     while (!WindowShouldClose())
@@ -41,7 +43,7 @@ void cpaint_start_loop(void)
 
             
         // Screen
-        if (state.state == ON_MAIN_CANVAS)
+        if (!gui_is_click_consumed(state.brush.current_pos, &(state.gui_data)))
         {
             BeginTextureMode(state.canvas.tex);
             handle_brush_draw_input(&(state.brush), &(state.canvas));
@@ -62,7 +64,6 @@ void cpaint_start_loop(void)
             
             if (IsKeyPressed(KEY_S) && IsKeyDown(KEY_LEFT_CONTROL))
             {
-                state.state = ON_SAVE_DIALOGUE;
                 state.brush.is_locked = true;
                 SetMouseCursor(MOUSE_CURSOR_DEFAULT);
             }
@@ -73,37 +74,10 @@ void cpaint_start_loop(void)
         
         draw_canvas(&(state.canvas));
 
-        cpaint_update_gui(&state);
+        gui_render_all(&(state.gui_data));
         
         EndDrawing();
     }
     canvas_destroy(&(state.canvas));
     CloseWindow();
-}
-
-static void cpaint_update_gui(CPaintState *cpaint)
-{
-    switch(cpaint->state)
-    {    
-        case ON_SAVE_DIALOGUE:
-        {
-            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 100});
-
-            const FiledialogueInput input = filedialogue_draw_and_get_inputs(file_to_save);
-            if (input == FILEDIALOGUE_CLOSE) 
-            {
-                cpaint->state = ON_MAIN_CANVAS;
-                cpaint->brush.is_locked = false;
-                SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
-            }
-            if (input == FILEDIALOGUE_SAVE)
-            {
-                cpaint->state = ON_MAIN_CANVAS;
-                cpaint->brush.is_locked = false;
-                save_canvas_to_file(&(cpaint->canvas), file_to_save);
-            }
-
-            break;
-        }
-    }
 }
