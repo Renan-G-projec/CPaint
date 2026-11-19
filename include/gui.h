@@ -3,6 +3,7 @@
 #define GUI_H
 
 #include <raylib.h>
+#include "canvas.h"
 
 typedef enum {
     CPAINT_GUI_FREE,
@@ -14,6 +15,8 @@ typedef enum {
 typedef struct {
     // Dependencies and state
     Color *current_color;
+    Canvas *current_canvas;
+
     // Layout
     Rectangle color_picker_rec;
     Rectangle color_picker_toggle_rec;
@@ -21,13 +24,11 @@ typedef struct {
     Rectangle save_new_canvas_input_rec;
 
     CPaintGuiState current_state;
-    bool shall_save;
     bool mouse_clicked_gui;
-    char *filename_buffer;
 
 } GuiData;
 
-GuiData gui_init(Vector2 screen_size, Color *current_color);
+GuiData gui_init(Vector2 screen_size, Color *current_color, Canvas *current_canvas);
 
 void gui_render_all(GuiData *);
 void gui_render_color_picker(Rectangle rect, Color *dest_color);

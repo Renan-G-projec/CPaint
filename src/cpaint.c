@@ -29,7 +29,7 @@ void cpaint_start_loop(void)
         0
     };
 
-    state.gui_data = gui_init((Vector2){WINDOW_WIDTH, WINDOW_HEIGHT}, &(state.brush.color));
+    state.gui_data = gui_init((Vector2){WINDOW_WIDTH, WINDOW_HEIGHT}, &(state.brush.color), &(state.canvas));
 
     SetTargetFPS(120);
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
@@ -66,7 +66,7 @@ void cpaint_start_loop(void)
                 { 
                     state.canvas.filename = (char*)malloc(sizeof(char) * 256);
                     memset(state.canvas.filename, 0, sizeof(char) * 256);
-                    state.gui_data.filename_buffer = state.canvas.filename;
+
                     state.gui_data.current_state = CPAINT_GUI_SAVE_NEW_CANVAS; 
                 } 
                 else
@@ -85,13 +85,6 @@ void cpaint_start_loop(void)
 
         gui_render_all(&(state.gui_data));
         EndDrawing();
-
-        if (state.gui_data.shall_save)
-        {
-            save_canvas_to_file(&(state.canvas), state.canvas.filename);
-            state.canvas.is_first_save = false;
-            state.gui_data.shall_save = false;
-        }
     }
     canvas_destroy(&(state.canvas));
     CloseWindow();

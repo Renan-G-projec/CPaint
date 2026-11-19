@@ -4,11 +4,12 @@
 #include "gui.h"
 #include "raygui.h"
 
-GuiData gui_init(Vector2 screen_size, Color *current_color)
+GuiData gui_init(Vector2 screen_size, Color *current_color, Canvas *current_canvas)
 {
     GuiData d;
 
     d.current_color = current_color;
+    d.current_canvas = current_canvas;
 
     d.color_picker_rec = (Rectangle){20, screen_size.y - 140, 120, 120};
     d.color_picker_toggle_rec = (Rectangle){20, screen_size.y - 40, 100, 20};
@@ -17,11 +18,8 @@ GuiData gui_init(Vector2 screen_size, Color *current_color)
     d.save_new_canvas_input_rec = (Rectangle){d.save_new_canvas_rec.x + 20, (d.save_new_canvas_rec.height / 2) * 2, 360, 40};
 
     d.current_state = CPAINT_GUI_FREE;
-    d.shall_save = false;
     d.mouse_clicked_gui = false;
-
-    d.filename_buffer = NULL;
-
+    
     return d;
 }
 
@@ -70,12 +68,13 @@ void gui_render_all(GuiData *data)
     {
         int btn = 0;
         GuiMessageBox(data->save_new_canvas_rec, "Save canvas", "Save Canvas\nInput the directory and the filename the file will be saved on.", "Close;Save", &btn);
-        GuiTextBox(data->save_new_canvas_input_rec, data->filename_buffer, 255, true);
+        GuiTextBox(data->save_new_canvas_input_rec, data->current_canvas->filename, 255, true);
         if (btn != 0) data->mouse_clicked_gui = true;
         if (btn == 1) data->current_state = CPAINT_GUI_FREE;
         if (btn == 2)
         { 
-            data->shall_save = true;
+            save_canvas_to_file(data->current_canvas, data->current_canvas->filename);
+            data->current_canvas->is_first_save = false;
             data->current_state = CPAINT_GUI_FREE;
         }
     }
