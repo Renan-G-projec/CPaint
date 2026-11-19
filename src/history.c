@@ -131,6 +131,7 @@ void history_clear_redo_stack(CanvasHistory *history)
 
 MouseDrawCommand *history_get_last_mouse_draw_command(CanvasHistory *history)
 {
+    if (history_undo_stack_is_empty(history)) return NULL;
     return history->undo_stack + (history->undo_stack_head + COMMAND_BUFFER_SIZE - 1) % COMMAND_BUFFER_SIZE;
 }
 

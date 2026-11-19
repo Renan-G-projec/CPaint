@@ -18,6 +18,7 @@ GuiData gui_init(Vector2 screen_size, Color *current_color)
 
     d.current_state = CPAINT_GUI_FREE;
     d.shall_save = false;
+    d.mouse_clicked_gui = false;
 
     d.filename_buffer = NULL;
 
@@ -25,7 +26,21 @@ GuiData gui_init(Vector2 screen_size, Color *current_color)
 }
 
 bool gui_is_click_consumed(Vector2 mouse_pos, GuiData *data) { 
-    return data->current_state != CPAINT_GUI_FREE;
+    if (data->mouse_clicked_gui && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) return true;
+    data->mouse_clicked_gui = false;
+
+    // MAIN SCREEN BUTTONS
+    if (data->current_state == CPAINT_GUI_FREE)
+    {
+        // COLOR PICKER
+        if (CheckCollisionPointRec(mouse_pos, data->color_picker_toggle_rec)) return true;
+    }
+
+    if (data->current_state == CPAINT_GUI_CHANGING_COLOR)
+    {
+        return true;
+    }
+    return false;
 }
 
 void gui_render_all(GuiData *data)
@@ -45,7 +60,7 @@ void gui_render_all(GuiData *data)
             || old_color.b != data->current_color->b 
             || old_color.a != data->current_color->a;
 
-        if (!color_changed && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !CheckCollisionPointRec(GetMousePosition(), data->color_picker_rec))
+        if (!data->mouse_clicked_gui && !color_changed && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !CheckCollisionPointRec(GetMousePosition(), data->color_picker_rec))
         {
             data->current_state = CPAINT_GUI_FREE;
         }
@@ -56,6 +71,7 @@ void gui_render_all(GuiData *data)
         int btn = 0;
         GuiMessageBox(data->save_new_canvas_rec, "Save canvas", "Save Canvas\nInput the directory and the filename the file will be saved on.", "Close;Save", &btn);
         GuiTextBox(data->save_new_canvas_input_rec, data->filename_buffer, 255, true);
+        if (btn != 0) data->mouse_clicked_gui = true;
         if (btn == 1) data->current_state = CPAINT_GUI_FREE;
         if (btn == 2)
         { 

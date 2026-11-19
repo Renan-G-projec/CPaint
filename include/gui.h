@@ -22,7 +22,9 @@ typedef struct {
 
     CPaintGuiState current_state;
     bool shall_save;
+    bool mouse_clicked_gui;
     char *filename_buffer;
+
 } GuiData;
 
 GuiData gui_init(Vector2 screen_size, Color *current_color);
