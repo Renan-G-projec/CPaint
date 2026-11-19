@@ -16,12 +16,6 @@ void draw_canvas_from_history(Canvas *canvas)
 
     ClearBackground(BLACK);
     DrawTextureRec(history->old_history_initial_image, (Rectangle){0, 0, history->old_history_initial_image.width, -history->old_history_initial_image.height}, canvas->position, RAYWHITE);
-
-    for (size_t idx = 0; idx <= history->old_history_stack_size; ++idx)
-    {
-        if (!history->old_history_stack[idx].mouse_logs) continue;
-        draw_polyline(history->old_history_stack[idx].mouse_logs, history->old_history_stack[idx].num_of_logs, history->old_history_stack[idx].brush_size, history->old_history_stack[idx].brush_color);
-    }
     
     if (history_undo_stack_is_empty(history)) return;
     for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)

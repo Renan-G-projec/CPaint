@@ -54,7 +54,6 @@ void cpaint_start_loop(void)
             
             if (IsKeyPressed(KEY_Y) && IsKeyDown(KEY_LEFT_CONTROL) && IsMouseButtonUp(MOUSE_BUTTON_LEFT))
             {
-
                 history_redo(&(state.canvas.history));
                 draw_canvas_from_history(&(state.canvas));
             }
