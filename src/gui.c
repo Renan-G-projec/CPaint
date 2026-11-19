@@ -60,6 +60,7 @@ void gui_render_all(GuiData *data)
 
         if (!data->mouse_clicked_gui && !color_changed && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !CheckCollisionPointRec(GetMousePosition(), data->color_picker_rec))
         {
+            data->mouse_clicked_gui = true;
             data->current_state = CPAINT_GUI_FREE;
         }
     }

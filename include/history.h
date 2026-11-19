@@ -16,6 +16,7 @@ typedef struct
     Vector2 *mouse_logs;
     size_t num_of_logs;
     size_t log_capacity;
+    Color brush_color;
     float brush_size;
 } MouseDrawCommand;
 
@@ -52,7 +53,7 @@ MouseDrawCommand *history_get_last_mouse_draw_command(CanvasHistory*);
 
 void history_destroy(CanvasHistory*);
 
-MouseDrawCommand* history_create_mouse_draw_command(CanvasHistory*, float brush_size);
+MouseDrawCommand* history_create_mouse_draw_command(CanvasHistory*, float brush_size, Color brush_color);
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);
 
 void history_save_snapshot(CanvasHistory*, Texture2D);

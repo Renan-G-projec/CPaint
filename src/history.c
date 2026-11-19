@@ -142,7 +142,7 @@ void history_destroy(CanvasHistory *history)
     history_clear_old_history(history);
 }
 
-MouseDrawCommand *history_create_mouse_draw_command(CanvasHistory* history, float brush_size)
+MouseDrawCommand *history_create_mouse_draw_command(CanvasHistory* history, float brush_size, Color brush_color)
 {
     if (history_undo_stack_is_empty(history)) 
     {
@@ -155,7 +155,7 @@ MouseDrawCommand *history_create_mouse_draw_command(CanvasHistory* history, floa
         history->undo_stack_tail++;
     }
     
-    const MouseDrawCommand mouse_draw_command = (MouseDrawCommand){malloc(MOUSE_BUFFER_SIZE * sizeof(Vector2)), (size_t)0, (size_t)MOUSE_BUFFER_SIZE, brush_size};
+    const MouseDrawCommand mouse_draw_command = (MouseDrawCommand){malloc(MOUSE_BUFFER_SIZE * sizeof(Vector2)), (size_t)0, (size_t)MOUSE_BUFFER_SIZE, brush_color, brush_size};
 
     history->undo_stack[history->undo_stack_head] = mouse_draw_command;
     MouseDrawCommand *mouse_draw_command_address = history->undo_stack + history->undo_stack_head;

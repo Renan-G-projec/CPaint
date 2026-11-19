@@ -20,14 +20,14 @@ void draw_canvas_from_history(Canvas *canvas)
     for (size_t idx = 0; idx <= history->old_history_stack_size; ++idx)
     {
         if (!history->old_history_stack[idx].mouse_logs) continue;
-        draw_polyline(history->old_history_stack[idx].mouse_logs, history->old_history_stack[idx].num_of_logs, history->old_history_stack[idx].brush_size);
+        draw_polyline(history->old_history_stack[idx].mouse_logs, history->old_history_stack[idx].num_of_logs, history->old_history_stack[idx].brush_size, history->old_history_stack[idx].brush_color);
     }
     
     if (history_undo_stack_is_empty(history)) return;
     for (int idx = history->undo_stack_tail; idx != history->undo_stack_head; idx = (idx + 1) % COMMAND_BUFFER_SIZE)
     {
         if (!history->undo_stack[idx].mouse_logs) continue;
-        draw_polyline(history->undo_stack[idx].mouse_logs, history->undo_stack[idx].num_of_logs, history->undo_stack[idx].brush_size);
+        draw_polyline(history->undo_stack[idx].mouse_logs, history->undo_stack[idx].num_of_logs, history->undo_stack[idx].brush_size, history->undo_stack[idx].brush_color);
     }
 
     draw_canvas(canvas);
@@ -40,15 +40,15 @@ bool save_canvas_to_file(Canvas *canvas, const char *filepath)
     return ExportImage(img, filepath);
 }
 
-void draw_polyline(const Vector2 *positions, int qtd, float size)
+void draw_polyline(const Vector2 *positions, int qtd, float size, Color color)
 {
     if (!positions || qtd == 0) return;
 
-    DrawCircle(positions[0].x, positions[0].y, size, RAYWHITE);
+    DrawCircle(positions[0].x, positions[0].y, size, color);
     for (int i = 1; i < qtd; ++i)
     {
-        DrawLineEx(positions[i - 1], positions[i], size * 2, RAYWHITE);
-        DrawCircle(positions[i].x, positions[i].y, size, RAYWHITE);
+        DrawLineEx(positions[i - 1], positions[i], size * 2, color);
+        DrawCircle(positions[i].x, positions[i].y, size, color);
     }
 }
 
@@ -62,21 +62,21 @@ void handle_brush_draw_input(Brush *brush, Canvas *canvas)
 
     // First click
     if (brush->changed_size) {
-        history_create_mouse_draw_command(&(canvas->history), brush->size);
+        history_create_mouse_draw_command(&(canvas->history), brush->size, brush->color);
         return;
     }
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         history_clear_redo_stack(&(canvas->history));
-        history_create_mouse_draw_command(&(canvas->history), brush->size);
+        history_create_mouse_draw_command(&(canvas->history), brush->size, brush->color);
         return;
     }
 
     // Not First click
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
-
+        
         DrawLineEx(brush->last_pos, brush->current_pos, brush->size * 2, brush->color);
         
         DrawCircle(mouse_pos.x, mouse_pos.y, brush->size, brush->color);
