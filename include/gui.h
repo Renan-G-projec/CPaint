@@ -26,12 +26,16 @@ typedef struct {
     CPaintGuiState current_state;
     bool mouse_clicked_gui;
 
+    bool on_error;
+    char error_message[128];
+
 } GuiData;
 
 GuiData gui_init(Vector2 screen_size, Color *current_color, Canvas *current_canvas);
 
 void gui_render_all(GuiData *);
 void gui_render_color_picker(Rectangle rect, Color *dest_color);
+void gui_render_error(GuiData *);
 
 bool gui_is_click_consumed(Vector2 mouse_pos, GuiData *data);
 

@@ -19,6 +19,8 @@ GuiData gui_init(Vector2 screen_size, Color *current_color, Canvas *current_canv
 
     d.current_state = CPAINT_GUI_FREE;
     d.mouse_clicked_gui = false;
+
+    d.on_error = false;
     
     return d;
 }
@@ -74,14 +76,33 @@ void gui_render_all(GuiData *data)
         if (btn == 1) data->current_state = CPAINT_GUI_FREE;
         if (btn == 2)
         { 
-            save_canvas_to_file(data->current_canvas, data->current_canvas->filename);
-            data->current_canvas->is_first_save = false;
-            data->current_state = CPAINT_GUI_FREE;
+            bool success = save_canvas_to_file(data->current_canvas, data->current_canvas->filename);
+            if (success)
+            {
+                data->current_canvas->is_first_save = false;
+                data->current_state = CPAINT_GUI_FREE;
+            }
+            else
+            {
+                data->on_error = true;
+                strncpy(data->error_message, "Error: Could not save or open file", 128);
+            }
         }
     }
+
+    gui_render_error(data);
 }
 
 void gui_render_color_picker(Rectangle rect, Color *dest)
 {
     GuiColorPicker(rect, "Color picker", dest);
+}
+
+void gui_render_error(GuiData *data)
+{
+    if (!data->on_error) return;
+    if (GuiWindowBox(data->save_new_canvas_rec, data->error_message))
+    {
+        data->on_error = false;
+    }
 }

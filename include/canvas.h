@@ -30,6 +30,7 @@ void draw_canvas_from_history(Canvas *canvas);
 void handle_brush_draw_input(Brush *brush, Canvas *canvas);
 void draw_polyline(const Vector2* position, int qtd, float size, Color color);
 bool save_canvas_to_file(Canvas *canvas, const char *filepath);
+bool open_canvas_from_file(Canvas *canvas, const char* filepath);
 
 void canvas_destroy(Canvas *canvas);
 
