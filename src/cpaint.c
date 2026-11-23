@@ -1,9 +1,10 @@
 // Ad Maiorem Dei Gloriam!
 #include <raylib.h>
 #include <raygui.h>
+#include <string.h>
+#include <nvdialog.h>
 #include "cpaint.h"
 #include "canvas.h"
-#include <string.h>
 #include "history.h"
 
 #include "gui.h"
@@ -29,11 +30,18 @@ void cpaint_start_loop(void)
         0
     };
 
+    if (nvd_init() != 0)
+    {
+        printf("Error: Could not initialize nvdialog.\n");
+        return;
+    }
+
+
     state.gui_data = gui_init((Vector2){WINDOW_WIDTH, WINDOW_HEIGHT}, &(state.brush.color), &(state.canvas));
 
     SetTargetFPS(120);
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
-    
+
     while (!WindowShouldClose())
     {
         state.brush.last_pos = state.brush.current_pos;
