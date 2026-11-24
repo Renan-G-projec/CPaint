@@ -6,18 +6,19 @@ Viewport viewport_init(Rectangle rect, Canvas *canvas)
     Viewport viewport;
 
     viewport.rect = rect;
-
     viewport.zoom.x = 1.0;
     viewport.zoom.y = 1.0;
-
     viewport.offset.x = 0.0;
     viewport.offset.y = 0.0;
 
     viewport.canvas = canvas;
-
     viewport.view = LoadRenderTexture(rect.width, rect.height);
 
+    viewport.zoom_sensitivity = 0.15f;
+
     viewport.bg_color = WHITE;
+    viewport.is_dragging = false;
+
     return viewport;
 }
 
@@ -38,6 +39,33 @@ void viewport_render_internal(Viewport *viewport)
     DrawTexturePro(viewport->canvas->tex.texture, canvas_src, canvas_dest, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
     EndTextureMode();
+}
+
+void viewport_handle_mouse_input(Viewport *viewport)
+{
+    if (viewport->is_dragging)
+    {
+        Vector2 mouse_delta = GetMouseDelta();
+        Vector2 mouse_delta_with_zoom = (Vector2){mouse_delta.x / viewport->zoom.x, mouse_delta.y / viewport->zoom.y};
+        viewport->offset.x += mouse_delta_with_zoom.x;
+        viewport->offset.y -= mouse_delta_with_zoom.y;
+
+        if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) viewport->is_dragging = false;
+    }
+    else
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && viewport_is_mouse_over(viewport)) viewport->is_dragging = true;
+    }
+
+    float wheel_movement = GetMouseWheelMove();
+    if (wheel_movement != 0 && !viewport->is_dragging && viewport_is_mouse_over(viewport))
+    {
+        viewport->zoom.x += viewport->zoom_sensitivity * wheel_movement;
+        viewport->zoom.y += viewport->zoom_sensitivity * wheel_movement;
+
+        viewport->zoom.x = viewport->zoom.x < VIEWPORT_MIN_ZOOM_FACTOR ? VIEWPORT_MIN_ZOOM_FACTOR : viewport->zoom.x;
+        viewport->zoom.y = viewport->zoom.y < VIEWPORT_MIN_ZOOM_FACTOR ? VIEWPORT_MIN_ZOOM_FACTOR : viewport->zoom.y;
+    }
 }
 
 bool viewport_is_mouse_over(Viewport *viewport)

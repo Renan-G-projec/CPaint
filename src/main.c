@@ -25,10 +25,11 @@ int main(void)
     ClearBackground(PURPLE);
 
     EndTextureMode();
-    SetTargetFPS(10);
+    SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
+        viewport_handle_mouse_input(&viewport);
         viewport_render_internal(&viewport);
 
         BeginDrawing();
