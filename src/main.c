@@ -30,14 +30,12 @@ int main(void)
 
     while (!WindowShouldClose())
     {
-        viewport_handle_mouse_input(&viewport);
         viewport_update(&viewport);
         viewport_render_internal(&viewport);
 
         BeginDrawing();
 
         viewport_render(&viewport);
-        printf("Is mouse over the viewport: %d\nIs mouse in the canvas: %d\n", viewport_is_mouse_over(&viewport), viewport_is_mouse_over_canvas(&viewport));
 
         EndDrawing();
     }

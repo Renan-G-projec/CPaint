@@ -26,10 +26,10 @@ Viewport viewport_init(Rectangle rect, Canvas *canvas);
 void viewport_update(Viewport *viewport);
 void viewport_render(Viewport *viewport); // Draws the entire viewport, needs to habe called the viewport_render_internal first to render the canvas
 void viewport_render_internal(Viewport *viewport); // Draws only the canvas and other viewport stuff inside the viewport
-void viewport_handle_mouse_input(Viewport *viewport); // OChanges the zoom and the offset by the mouse position, if the mouse is clicked.
+void viewport_handle_mouse_transform_input(Viewport *viewport); // OChanges the zoom and the offset by the mouse position, if the mouse is clicked.
 bool viewport_is_mouse_over(Viewport *viewport);
 bool viewport_is_mouse_over_canvas(Viewport *viewport);
-Rectangle viewport_get_canvas_rect_global(Viewport *canvas);
+Rectangle viewport_get_canvas_rect_global(Viewport *viewport);
 Rectangle viewport_get_canvas_rect_local(Viewport *viewport);
 
 #endif

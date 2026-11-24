@@ -25,6 +25,8 @@ Viewport viewport_init(Rectangle rect, Canvas *canvas)
 
 void viewport_update(Viewport *viewport)
 {
+    viewport_handle_mouse_transform_input(viewport);
+    
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         viewport->is_drawing_on_canvas = viewport_is_mouse_over_canvas(viewport);
@@ -34,26 +36,29 @@ void viewport_update(Viewport *viewport)
         viewport->is_drawing_on_canvas = false;
         viewport->canvas->drawing = false;
     }
-
+    
     if (viewport->is_drawing_on_canvas)
     {
         BeginTextureMode(viewport->canvas->tex);
-
+        
         Rectangle global_rect = viewport_get_canvas_rect_global(viewport);
         Vector2 mouse_pos_global = GetMousePosition();
-
+        
         Vector2 local_mouse_position_scaled = (Vector2){mouse_pos_global.x - global_rect.x, mouse_pos_global.y - global_rect.y};
         Vector2 local_mouse_position = (Vector2){local_mouse_position_scaled.x / viewport->zoom.x, local_mouse_position_scaled.y / viewport->zoom.y};
-
+        
         canvas_draw_and_connect(viewport->canvas, local_mouse_position, 10.0f, BLUE);
         EndTextureMode();
     } 
+    
 }
 
 void viewport_render(Viewport *viewport)
 {
-    Vector2 pos = {viewport->rect.x, viewport->rect.y};
-    DrawTextureEx(viewport->view.texture, pos, 0.0f, 1.0f, WHITE);
+    Rectangle viewrect = (Rectangle){0.0f, 0.0f, viewport->view.texture.width, -viewport->view.texture.height};
+    Vector2 pos = (Vector2){viewport->rect.x, viewport->rect.y};
+    //viewrect.height *= -1;
+    DrawTextureRec(viewport->view.texture, viewrect, pos, WHITE);
 }
 
 void viewport_render_internal(Viewport *viewport)
@@ -62,21 +67,21 @@ void viewport_render_internal(Viewport *viewport)
 
     ClearBackground(viewport->bg_color);
 
-    Rectangle canvas_src = (Rectangle){0.0f, 0.0f, viewport->canvas->tex.texture.width, viewport->canvas->tex.texture.height};\
+    Rectangle canvas_src = (Rectangle){0.0f, 0.0f, viewport->canvas->tex.texture.width, -viewport->canvas->tex.texture.height};
     Rectangle canvas_dest = viewport_get_canvas_rect_local(viewport);
     DrawTexturePro(viewport->canvas->tex.texture, canvas_src, canvas_dest, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
     EndTextureMode();
 }
 
-void viewport_handle_mouse_input(Viewport *viewport)
+void viewport_handle_mouse_transform_input(Viewport *viewport)
 {
     if (viewport->is_dragging)
     {
         Vector2 mouse_delta = GetMouseDelta();
         Vector2 mouse_delta_with_zoom = (Vector2){mouse_delta.x / viewport->zoom.x, mouse_delta.y / viewport->zoom.y};
         viewport->offset.x += mouse_delta_with_zoom.x;
-        viewport->offset.y -= mouse_delta_with_zoom.y;
+        viewport->offset.y += mouse_delta_with_zoom.y;
 
         if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) 
         {
