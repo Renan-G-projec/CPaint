@@ -50,11 +50,19 @@ void viewport_handle_mouse_input(Viewport *viewport)
         viewport->offset.x += mouse_delta_with_zoom.x;
         viewport->offset.y -= mouse_delta_with_zoom.y;
 
-        if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) viewport->is_dragging = false;
+        if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) 
+        {
+            viewport->is_dragging = false;
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+        }
     }
     else
     {
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && viewport_is_mouse_over(viewport)) viewport->is_dragging = true;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && viewport_is_mouse_over(viewport))
+        {
+            viewport->is_dragging = true;
+            SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);
+        }
     }
 
     float wheel_movement = GetMouseWheelMove();
