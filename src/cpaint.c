@@ -52,7 +52,7 @@ void cpaint_start_loop(void)
         if (!gui_is_click_consumed(state.brush.current_pos, &(state.gui_data)))
         {
             BeginTextureMode(state.canvas.tex);
-            handle_brush_draw_input(&(state.brush), &(state.canvas));
+            canvas_draw_and_connect(&(state.brush), &(state.canvas));
 
             if (IsKeyPressed(KEY_Z) && IsKeyDown(KEY_LEFT_CONTROL) && IsMouseButtonUp(MOUSE_BUTTON_LEFT))
             {
@@ -78,7 +78,7 @@ void cpaint_start_loop(void)
                 } 
                 else
                 {
-                    save_canvas_to_file(&(state.canvas), state.canvas.filename);
+                    canvas_save(&(state.canvas), state.canvas.filename);
                 }
 
                 SetMouseCursor(MOUSE_CURSOR_DEFAULT);
@@ -88,7 +88,7 @@ void cpaint_start_loop(void)
         BeginDrawing();
         ClearBackground(BLACK);
         
-        draw_canvas(&(state.canvas));
+        canvas_render(&(state.canvas));
 
         gui_render_all(&(state.gui_data));
         EndDrawing();

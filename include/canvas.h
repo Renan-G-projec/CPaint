@@ -11,7 +11,10 @@
 typedef struct {
     RenderTexture2D tex;
     CanvasHistory history;
-    Vector2 position;
+
+    bool drawing;
+    Vector2 last_draw_position;
+
     char *filename;
     bool is_first_save;
 } Canvas;
@@ -25,12 +28,10 @@ typedef struct {
     bool is_locked; 
 } Brush;
 
-void draw_canvas(Canvas *canvas);
-void draw_canvas_from_history(Canvas *canvas);
-void handle_brush_draw_input(Brush *brush, Canvas *canvas);
-void draw_polyline(const Vector2* position, int qtd, float size, Color color);
-bool save_canvas_to_file(Canvas *canvas, const char *filepath);
-bool open_canvas_from_file(Canvas *canvas, const char* filepath);
+void canvas_draw_and_connect(Canvas *canvas, Vector2 position, float size, Color color);
+
+bool canvas_save(Canvas *canvas, const char *filepath);
+bool canvas_load(Canvas *canvas, const char *filepath);
 
 void canvas_destroy(Canvas *canvas);
 

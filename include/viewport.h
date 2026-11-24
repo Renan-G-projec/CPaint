@@ -18,6 +18,7 @@ typedef struct Viewport {
     float zoom_sensitivity;
 
     Color bg_color;
+    bool is_drawing_on_canvas;
     bool is_dragging;
 } Viewport;
 

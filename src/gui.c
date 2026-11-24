@@ -76,7 +76,7 @@ void gui_render_all(GuiData *data)
         if (btn == 1) data->current_state = CPAINT_GUI_FREE;
         if (btn == 2)
         { 
-            bool success = save_canvas_to_file(data->current_canvas, data->current_canvas->filename);
+            bool success = canvas_save(data->current_canvas, data->current_canvas->filename);
             if (success)
             {
                 data->current_canvas->is_first_save = false;

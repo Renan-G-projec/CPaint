@@ -17,9 +17,37 @@ Viewport viewport_init(Rectangle rect, Canvas *canvas)
     viewport.zoom_sensitivity = 0.15f;
 
     viewport.bg_color = WHITE;
+    viewport.is_drawing_on_canvas = false;
     viewport.is_dragging = false;
 
     return viewport;
+}
+
+void viewport_update(Viewport *viewport)
+{
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        viewport->is_drawing_on_canvas = viewport_is_mouse_over_canvas(viewport);
+    }
+    else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    {
+        viewport->is_drawing_on_canvas = false;
+        viewport->canvas->drawing = false;
+    }
+
+    if (viewport->is_drawing_on_canvas)
+    {
+        BeginTextureMode(viewport->canvas->tex);
+
+        Rectangle global_rect = viewport_get_canvas_rect_global(viewport);
+        Vector2 mouse_pos_global = GetMousePosition();
+
+        Vector2 local_mouse_position_scaled = (Vector2){mouse_pos_global.x - global_rect.x, mouse_pos_global.y - global_rect.y};
+        Vector2 local_mouse_position = (Vector2){local_mouse_position_scaled.x / viewport->zoom.x, local_mouse_position_scaled.y / viewport->zoom.y};
+
+        canvas_draw_and_connect(viewport->canvas, local_mouse_position, 10.0f, BLUE);
+        EndTextureMode();
+    } 
 }
 
 void viewport_render(Viewport *viewport)
@@ -34,7 +62,7 @@ void viewport_render_internal(Viewport *viewport)
 
     ClearBackground(viewport->bg_color);
 
-    Rectangle canvas_src = (Rectangle){0.0f, 0.0f, viewport->canvas->tex.texture.width, -viewport->canvas->tex.texture.height};\
+    Rectangle canvas_src = (Rectangle){0.0f, 0.0f, viewport->canvas->tex.texture.width, viewport->canvas->tex.texture.height};\
     Rectangle canvas_dest = viewport_get_canvas_rect_local(viewport);
     DrawTexturePro(viewport->canvas->tex.texture, canvas_src, canvas_dest, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
@@ -58,7 +86,7 @@ void viewport_handle_mouse_input(Viewport *viewport)
     }
     else
     {
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && viewport_is_mouse_over(viewport))
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && viewport_is_mouse_over(viewport) && !viewport_is_mouse_over_canvas(viewport))
         {
             viewport->is_dragging = true;
             SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);

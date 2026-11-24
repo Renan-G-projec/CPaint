@@ -52,5 +52,6 @@ MouseDrawCommand* history_create_mouse_draw_command(CanvasHistory*, float brush_
 void history_log_mouse_position(MouseDrawCommand*, const Vector2 mouse_position);
 
 void history_save_snapshot(CanvasHistory*, Texture2D);
+void history_snapshot(CanvasHistory *, Texture2D);
 
 #endif

@@ -13,6 +13,7 @@ int main(void)
     Canvas canvas = {
         LoadRenderTexture(100, 100),
         history_create(),
+        false,
         {0, 0},
         NULL,
         true,
@@ -30,6 +31,7 @@ int main(void)
     while (!WindowShouldClose())
     {
         viewport_handle_mouse_input(&viewport);
+        viewport_update(&viewport);
         viewport_render_internal(&viewport);
 
         BeginDrawing();
