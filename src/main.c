@@ -1,14 +1,13 @@
 // Ad Maiorem Dei Gloriam!
-#include "cpaint.h"
 
 #include "viewport.h"
 #include "canvas.h"
 #include "gui.h"
 
+#define CTRL_KEY(key) ((IsKeyPressed(KEY_LEFT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)) && IsKeyPressed(key))
+
 int main(void)
 {
-    //cpaint_start_loop()
-
     InitWindow(1280, 720, "Test");
 
     Canvas canvas = {
@@ -42,11 +41,11 @@ int main(void)
         }
             
         
-        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+        if (CTRL_KEY(KEY_Z))
         {
             canvas_undo(&canvas);
         }
-        else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE))
+        else if (CTRL_KEY(KEY_Y))
         {
             canvas_redo(&canvas);
         }
