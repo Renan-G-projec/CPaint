@@ -12,7 +12,8 @@ int main(void)
 
     Canvas canvas = {
         LoadRenderTexture(100, 100),
-        history_create(),
+        history_buffer_create(),
+        history_buffer_create(),
         false,
         {0, 0},
         NULL,
@@ -27,12 +28,20 @@ int main(void)
 
     EndTextureMode();
     SetTargetFPS(60);
-
+    history_buffer_append(&(canvas.undo_buffer), canvas_take_snapshot(&canvas));
     while (!WindowShouldClose())
     {
         viewport_update(&viewport);
         viewport_render_internal(&viewport);
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+        {
+            canvas_undo(&canvas);
+        }
+        else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE))
+        {
+            canvas_redo(&canvas);
+        }
         BeginDrawing();
 
         viewport_render(&viewport);

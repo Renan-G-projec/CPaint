@@ -5,7 +5,7 @@
 #include <nvdialog.h>
 #include "cpaint.h"
 #include "canvas.h"
-#include "history.h"
+#include "history_buffer.h"
 
 #include "gui.h"
 void cpaint_start_loop(void)

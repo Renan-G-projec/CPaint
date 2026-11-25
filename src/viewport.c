@@ -30,11 +30,21 @@ void viewport_update(Viewport *viewport)
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         viewport->is_drawing_on_canvas = viewport_is_mouse_over_canvas(viewport);
+        if (viewport->is_drawing_on_canvas) 
+        {
+            history_buffer_clear(&(viewport->canvas->redo_buffer));
+            printf("CLEARING THE REDO STACK\n");
+        }
+        
     }
     else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
     {
+        if (viewport->is_drawing_on_canvas)
+        {
+            canvas_on_stop_drawing(viewport->canvas);
+        }
         viewport->is_drawing_on_canvas = false;
-        viewport->canvas->drawing = false;
+        viewport->canvas->is_drawing = false;
     }
     
     if (viewport->is_drawing_on_canvas)

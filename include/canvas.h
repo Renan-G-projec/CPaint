@@ -6,13 +6,14 @@
 #define BRUSH_ADJUSTMENT_SIZE 1.0f
 #define BRUSH_MINIMUM_SIZE 1.0f
 
-#include "history.h"
+#include "history_buffer.h"
 
 typedef struct {
     RenderTexture2D tex;
-    CanvasHistory history;
+    HistoryBuffer undo_buffer;
+    HistoryBuffer redo_buffer;
 
-    bool drawing;
+    bool is_drawing;
     Vector2 last_draw_position;
 
     char *filename;
@@ -29,10 +30,15 @@ typedef struct {
 } Brush;
 
 void canvas_draw_and_connect(Canvas *canvas, Vector2 position, float size, Color color);
+void canvas_on_stop_drawing(Canvas *canvas);
+
+void canvas_undo(Canvas *canvas);
+void canvas_redo(Canvas *canvas);
 
 bool canvas_save(Canvas *canvas, const char *filepath);
 bool canvas_load(Canvas *canvas, const char *filepath);
 
 void canvas_destroy(Canvas *canvas);
+Texture2D canvas_take_snapshot(Canvas *canvas);
 
 #endif
