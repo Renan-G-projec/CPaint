@@ -75,7 +75,7 @@ int main(void)
         EndDrawing();
     }
     
-    CloseWindow();
     canvas_destroy(&canvas);
+    CloseWindow();
     return 0;
 }
