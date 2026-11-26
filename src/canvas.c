@@ -69,6 +69,7 @@ void canvas_redo(Canvas *canvas)
 
 void canvas_destroy(Canvas *canvas)
 {
+    if (canvas->filename) free(canvas->filename);
     history_buffer_clear(&(canvas->undo_buffer));
     history_buffer_clear(&(canvas->redo_buffer));
 }

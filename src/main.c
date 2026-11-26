@@ -1,5 +1,6 @@
 // Ad Maiorem Dei Gloriam!
 
+#include "nvdialog.h"
 #include "viewport.h"
 #include "canvas.h"
 #include "gui.h"
@@ -8,6 +9,13 @@
 
 int main(void)
 {
+    // Nvdialog for saving files and opening those
+    if (nvd_init() != 0)
+    {
+        puts("Error: Could not initialize nvdialog.\n");
+        return 1;
+    }
+
     InitWindow(1280, 720, "Test");
 
     Canvas canvas = {
@@ -16,11 +24,18 @@ int main(void)
         history_buffer_create(),
         false,
         {0, 0},
-        NULL,
         true,
+        malloc(sizeof(char) * 512)
     };
 
-    Color color = PURPLE;
+    if (!canvas.filename)
+    {
+        puts("Error: Could not allocate memory to filename.");
+        return 1;
+    }
+    
+
+    Color color = WHITE;
     GuiData gui = gui_init(&color, &canvas);
 
     Viewport viewport = viewport_init((Rectangle){140.0f, 60.0f, 1000.0f, 600.0f}, &canvas);
@@ -32,11 +47,12 @@ int main(void)
     EndTextureMode();
     SetTargetFPS(60);
     history_buffer_append(&(canvas.undo_buffer), canvas_take_snapshot(&canvas));
+
     while (!WindowShouldClose())
     {
         if (!gui.is_picking_color)
         {
-            viewport_update(&viewport);
+            viewport_update(&viewport, color);
             viewport_render_internal(&viewport);
         }
             
@@ -51,6 +67,7 @@ int main(void)
         }
         BeginDrawing();
 
+        ClearBackground(BLACK);
         viewport_render(&viewport);
         gui_update(&gui);
 
@@ -58,5 +75,6 @@ int main(void)
     }
     
     CloseWindow();
+    canvas_destroy(&canvas);
     return 0;
 }

@@ -16,8 +16,8 @@ typedef struct {
     bool is_drawing;
     Vector2 last_draw_position;
 
-    char *filename;
     bool is_first_save;
+    char *filename;
 } Canvas;
 
 typedef struct {

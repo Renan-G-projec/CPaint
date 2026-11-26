@@ -1,6 +1,5 @@
 // Ad Maiorem Dei Gloriam!
-#include <string.h>
-#include <stdio.h>
+#include "nvdialog.h"
 #include "gui.h"
 #include "raygui.h"
 
@@ -36,9 +35,43 @@ void gui_update(GuiData *data)
     
         GuiLock();
     }
+
     if (GuiButton(GUI_CHANGE_COLOR_BUTTON_RECT, "Change Color"))
     {
         data->is_picking_color = true;
     }
-GuiUnlock();
+    
+    if (GuiButton(GUI_SAVE_BUTTON_RECT, "Save File"))
+    {
+        if (data->current_canvas->is_first_save)
+        {
+
+            
+            NvdFileDialog *file_dialog = nvd_save_file_dialog_new("Save File", "MyDrawing.png");
+            if (!file_dialog)
+            {
+                printf("Error: Could not open file dialog. %s\n", NVD_CSTR(nvd_stringify_error((nvd_get_error()))));
+                GuiUnlock();
+                return;
+            }
+            
+            NvdDynamicString *file_to_save = nvd_get_file_location(file_dialog);
+            if (file_to_save)
+            {
+                const char *file = NVD_CSTR(file_to_save);
+                data->current_canvas->is_first_save = !canvas_save(data->current_canvas, file);
+            }
+            else
+            {
+                printf("NOT SELECTED A FILE\n");
+            }
+
+            nvd_free_object(file_dialog);
+        }
+        else
+        {
+
+        }
+        GuiUnlock();
+    }
 }

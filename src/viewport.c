@@ -23,7 +23,7 @@ Viewport viewport_init(Rectangle rect, Canvas *canvas)
     return viewport;
 }
 
-void viewport_update(Viewport *viewport)
+void viewport_update(Viewport *viewport, Color color_to_draw)
 {
     viewport_handle_mouse_transform_input(viewport);
     
@@ -57,7 +57,7 @@ void viewport_update(Viewport *viewport)
         Vector2 local_mouse_position_scaled = (Vector2){mouse_pos_global.x - global_rect.x, mouse_pos_global.y - global_rect.y};
         Vector2 local_mouse_position = (Vector2){local_mouse_position_scaled.x / viewport->zoom.x, local_mouse_position_scaled.y / viewport->zoom.y};
         
-        canvas_draw_and_connect(viewport->canvas, local_mouse_position, 10.0f, BLUE);
+        canvas_draw_and_connect(viewport->canvas, local_mouse_position, 10.0f, color_to_draw);
         EndTextureMode();
     } 
     
