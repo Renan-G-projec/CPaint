@@ -7,6 +7,7 @@
 #define BRUSH_MINIMUM_SIZE 1.0f
 
 #include "history_buffer.h"
+#include "dynamic_string.h"
 
 typedef struct {
     RenderTexture2D tex;
@@ -17,7 +18,7 @@ typedef struct {
     Vector2 last_draw_position;
 
     bool is_first_save;
-    char *filename;
+    CPaintDynamicString filename;
 } Canvas;
 
 typedef struct {

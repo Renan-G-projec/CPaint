@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include "canvas.h"
 #include "history_buffer.h"
+#include "dynamic_string.h"
 
 bool canvas_save(Canvas *canvas, const char *filepath)
 {
@@ -69,7 +70,7 @@ void canvas_redo(Canvas *canvas)
 
 void canvas_destroy(Canvas *canvas)
 {
-    if (canvas->filename) free(canvas->filename);
+    dynamic_string_delete(&(canvas->filename));
     history_buffer_clear(&(canvas->undo_buffer));
     history_buffer_clear(&(canvas->redo_buffer));
 }

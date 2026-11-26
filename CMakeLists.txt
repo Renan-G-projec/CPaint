@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CPaint C)
 
 set(C_STANDARD_REQUIRED 11)
-set(SRC external/raygui.c src/main.c src/canvas.c src/gui.c src/history_buffer.c  src/viewport.c)
+set(SRC external/raygui.c src/main.c src/canvas.c src/gui.c src/history_buffer.c src/dynamic_string.c src/viewport.c)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # TODO: change to fetch-content

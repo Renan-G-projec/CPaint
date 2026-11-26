@@ -3,6 +3,7 @@
 #include "nvdialog.h"
 #include "viewport.h"
 #include "canvas.h"
+#include "dynamic_string.h"
 #include "gui.h"
 
 #define CTRL_KEY(key) ((IsKeyPressed(KEY_LEFT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)) && IsKeyPressed(key))
@@ -25,10 +26,10 @@ int main(void)
         false,
         {0, 0},
         true,
-        malloc(sizeof(char) * 512)
+        dynamic_string_new(512)
     };
 
-    if (!canvas.filename)
+    if (!canvas.filename.buffer)
     {
         puts("Error: Could not allocate memory to filename.");
         return 1;

@@ -59,18 +59,23 @@ void gui_update(GuiData *data)
             if (file_to_save)
             {
                 const char *file = NVD_CSTR(file_to_save);
+                dynamic_string_set(&(data->current_canvas->filename), file);
                 data->current_canvas->is_first_save = !canvas_save(data->current_canvas, file);
-            }
-            else
-            {
-                printf("NOT SELECTED A FILE\n");
             }
 
             nvd_free_object(file_dialog);
         }
         else
         {
-
+            const char *file = dynamic_string_get_cstr(&(data->current_canvas->filename));
+            if (canvas_save(data->current_canvas, file))
+            {
+                printf("Successifuly saved canvas %s\n", file);
+            }
+            else
+            {
+                printf("Could not export canvas %s\n", file);
+            }
         }
         GuiUnlock();
     }
